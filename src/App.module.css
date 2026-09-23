@@ -1,0 +1,13 @@
+/* Корневой контейнер приложения */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Основная область контента */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

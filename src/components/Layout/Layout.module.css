@@ -1,0 +1,23 @@
+/* Основной контейнер layout */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+}
+
+/* Контейнер контента */
+.container {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+}
