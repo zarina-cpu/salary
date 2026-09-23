@@ -7,7 +7,8 @@ import TransactionForm from '../../components/TransactionForm/TransactionForm';
 import { getBalance, getRecentTransactions } from '../../services/summaryService';
 import { addIncome, updateIncome, deleteIncome } from '../../services/incomeService';
 import { addExpense, updateExpense, deleteExpense } from '../../services/expenseService';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../utils/constants';
+import { getItem, setItem } from '../../services/storage';
+import { STORAGE_KEYS } from '../../utils/constants';
 import styles from './Dashboard.module.css';
 
 function Dashboard() {
@@ -17,8 +18,14 @@ function Dashboard() {
   // Состояние данных
   const [balance, setBalance] = useState({ totalIncome: 0, totalExpense: 0, balance: 0 });
   const [recentTransactions, setRecentTransactions] = useState([]);
+  
+  // Валюта по умолчанию
+  const [defaultCurrency, setDefaultCurrency] = useState(() => {
+    const settings = getItem(STORAGE_KEYS.SETTINGS, {});
+    return settings.currency || 'UZS';
+  });
 
-  // Загрузка данных при монтировании и после изменений
+  // Загрузка данных
   const loadData = () => {
     const balanceData = getBalance();
     setBalance(balanceData);
@@ -35,14 +42,12 @@ function Dashboard() {
   const handleSubmit = (transactionData) => {
     try {
       if (editingTransaction) {
-        // Режим редактирования
         if (editingTransaction.type === 'income') {
           updateIncome(editingTransaction.id, transactionData);
         } else {
           updateExpense(editingTransaction.id, transactionData);
         }
       } else {
-        // Режим добавления
         if (transactionData.type === 'income') {
           addIncome(transactionData);
         } else {
@@ -50,7 +55,6 @@ function Dashboard() {
         }
       }
 
-      // Перезагружаем данные
       loadData();
       setShowForm(false);
       setEditingTransaction(null);
@@ -60,23 +64,19 @@ function Dashboard() {
     }
   };
 
-  // Обработчик редактирования
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     setShowForm(true);
   };
 
-  // Обработчик удаления
   const handleDelete = (id) => {
     if (!id) return;
 
-    // Подтверждение удаления
     if (!window.confirm('Вы уверены, что хотите удалить эту операцию?')) {
       return;
     }
 
     try {
-      // Определяем тип транзакции и вызываем соответствующий сервис
       const transaction = recentTransactions.find((t) => t.id === id);
       if (!transaction) return;
 
@@ -86,7 +86,6 @@ function Dashboard() {
         deleteExpense(id);
       }
 
-      // Перезагружаем данные
       loadData();
     } catch (error) {
       console.error('Ошибка при удалении транзакции:', error);
@@ -94,7 +93,6 @@ function Dashboard() {
     }
   };
 
-  // Закрытие модалки
   const handleCloseModal = () => {
     setShowForm(false);
     setEditingTransaction(null);
@@ -102,32 +100,32 @@ function Dashboard() {
 
   return (
     <div className={styles.dashboard}>
-      {/* Заголовок страницы */}
       <h1 className={styles.title}>Главная</h1>
 
-      {/* Карточки баланса */}
       <div className={styles.balanceGrid}>
         <BalanceCard
           title="Доходы"
           amount={balance.totalIncome}
           variant="success"
           icon="📈"
+          currency={defaultCurrency}
         />
         <BalanceCard
           title="Расходы"
           amount={balance.totalExpense}
           variant="danger"
           icon="📉"
+          currency={defaultCurrency}
         />
         <BalanceCard
           title="Баланс"
           amount={balance.balance}
           variant="primary"
           icon="💰"
+          currency={defaultCurrency}
         />
       </div>
 
-      {/* Секция последних операций */}
       <section className={styles.recentSection}>
         <h2 className={styles.sectionTitle}>Последние операции</h2>
         <TransactionList
@@ -136,10 +134,10 @@ function Dashboard() {
           onDelete={handleDelete}
           emptyMessage="Нет операций"
           emptyDescription="Добавьте первую операцию, чтобы начать учёт"
+          currency={defaultCurrency}
         />
       </section>
 
-      {/* Плавающая кнопка добавления */}
       <button
         className={styles.addButton}
         onClick={() => setShowForm(true)}
@@ -148,7 +146,6 @@ function Dashboard() {
         +
       </button>
 
-      {/* Модальное окно с формой */}
       <Modal
         isOpen={showForm}
         onClose={handleCloseModal}
@@ -158,6 +155,7 @@ function Dashboard() {
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
           editData={editingTransaction}
+          defaultCurrency={defaultCurrency}
         />
       </Modal>
     </div>

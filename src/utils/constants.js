@@ -1,4 +1,4 @@
-// Константы приложения: категории и типы операций
+// Константы приложения: категории, типы операций и валюты
 
 // Категории доходов
 export const INCOME_CATEGORIES = [
@@ -31,8 +31,17 @@ export const TRANSACTION_TYPES = [
   { id: 'expense', label: 'Расход' },
 ];
 
+// Валюты
+export const CURRENCIES = [
+  { id: 'UZS', label: 'Сум', symbol: 'сўм' },
+  { id: 'RUB', label: 'Рубль', symbol: '₽' },
+  { id: 'USD', label: 'Доллар', symbol: '$' },
+  { id: 'EUR', label: 'Евро', symbol: '€' },
+];
+
 // Ключи для localStorage
 export const STORAGE_KEYS = {
   INCOMES: 'incomes',
   EXPENSES: 'expenses',
+  SETTINGS: 'settings',
 };

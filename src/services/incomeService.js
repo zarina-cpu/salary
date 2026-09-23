@@ -25,7 +25,7 @@ export const getIncomeById = (id) => {
 
 /**
  * Добавление нового дохода
- * @param {Object} incomeData - Данные дохода (category, amount, date, comment)
+ * @param {Object} incomeData - Данные дохода (category, amount, date, comment, currency)
  * @returns {Object} Созданный объект дохода с id
  */
 export const addIncome = (incomeData) => {
@@ -43,6 +43,7 @@ export const addIncome = (incomeData) => {
     amount: parseFloat(incomeData.amount) || 0,
     date: incomeData.date || new Date().toISOString().split('T')[0],
     comment: incomeData.comment || '',
+    currency: incomeData.currency || 'UZS', // Валюта по умолчанию
     createdAt: new Date().toISOString(),
   };
 

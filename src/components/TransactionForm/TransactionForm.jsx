@@ -1,12 +1,13 @@
 // Форма добавления/редактирования транзакции
 import React, { useState, useEffect } from 'react';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../utils/constants';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, CURRENCIES } from '../../utils/constants';
 import styles from './TransactionForm.module.css';
 
 function TransactionForm({
   onSubmit,
   onCancel,
   editData = null,
+  defaultCurrency = 'UZS',
 }) {
   // Начальное состояние формы
   const initialFormData = {
@@ -15,6 +16,7 @@ function TransactionForm({
     amount: '',
     date: new Date().toISOString().split('T')[0],
     comment: '',
+    currency: defaultCurrency,
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -29,9 +31,10 @@ function TransactionForm({
         amount: editData.amount?.toString() || '',
         date: editData.date || new Date().toISOString().split('T')[0],
         comment: editData.comment || '',
+        currency: editData.currency || defaultCurrency,
       });
     }
-  }, [editData]);
+  }, [editData, defaultCurrency]);
 
   // Получение категорий в зависимости от типа операции
   const getCategories = () => {
@@ -43,7 +46,7 @@ function TransactionForm({
     setFormData((prev) => ({
       ...prev,
       type,
-      category: '', // Сбрасываем категорию при смене типа
+      category: '',
     }));
     setErrors((prev) => ({ ...prev, category: '' }));
   };
@@ -51,7 +54,6 @@ function TransactionForm({
   // Обработчик изменения поля
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Очищаем ошибку при изменении поля
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
@@ -85,7 +87,6 @@ function TransactionForm({
       return;
     }
 
-    // Преобразуем данные перед отправкой
     const transactionData = {
       ...formData,
       amount: parseFloat(formData.amount),
@@ -130,6 +131,22 @@ function TransactionForm({
 
       {/* Сетка полей */}
       <div className={styles.formGrid}>
+        {/* Валюта */}
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Валюта</label>
+          <select
+            className={styles.select}
+            value={formData.currency}
+            onChange={(e) => handleFieldChange('currency', e.target.value)}
+          >
+            {(CURRENCIES || []).map((curr) => (
+              <option key={curr.id} value={curr.id}>
+                {curr.label} ({curr.symbol})
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Категория */}
         <div className={styles.formGroup}>
           <label className={styles.label}>

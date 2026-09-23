@@ -35,6 +35,7 @@ export const addExpense = (expenseData) => {
 
   const expenses = getExpenses();
   
+  
   // Создаём новый объект расхода с уникальным ID
   const newExpense = {
     id: generateId(),
@@ -43,6 +44,7 @@ export const addExpense = (expenseData) => {
     amount: parseFloat(expenseData.amount) || 0,
     date: expenseData.date || new Date().toISOString().split('T')[0],
     comment: expenseData.comment || '',
+    currency: expenseData.currency || 'UZS',
     createdAt: new Date().toISOString(),
   };
 

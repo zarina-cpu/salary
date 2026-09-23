@@ -1,21 +1,15 @@
 // Таблица транзакций с действиями редактирования и удаления
 import React from 'react';
 import EmptyState from '../EmptyState/EmptyState';
+import { formatDateShort, formatCurrency } from '../../utils/formatters';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../utils/constants';
 import styles from './TransactionList.module.css';
 
-// Временная функция форматирования даты (будет заменена на formatters.js в фазе E)
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
+// Функция получения label категории по id
+const getCategoryLabel = (categoryId, type) => {
+  const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const category = categories.find((c) => c.id === categoryId);
+  return category?.label || categoryId || '—';
 };
 
 function TransactionList({
@@ -24,6 +18,7 @@ function TransactionList({
   onDelete,
   emptyMessage = 'Нет операций',
   emptyDescription = 'Добавьте первую операцию',
+  currency = 'UZS',
 }) {
   // Если транзакций нет — показываем заглушку
   if (!transactions || transactions.length === 0) {
@@ -58,7 +53,6 @@ function TransactionList({
             const typeIcon = isIncome ? '📈' : '📉';
             const typeIconClass = isIncome ? styles.typeIconIncome : styles.typeIconExpense;
             const amountClass = isIncome ? styles.amountIncome : styles.amountExpense;
-            const amountPrefix = isIncome ? '+' : '−';
 
             return (
               <tr key={transaction?.id} className={styles.tr}>
@@ -71,18 +65,17 @@ function TransactionList({
 
                 {/* Дата */}
                 <td className={`${styles.td} ${styles.dateCell}`}>
-                  {formatDate(transaction?.date)}
+                  {formatDateShort(transaction?.date)}
                 </td>
 
-                {/* Категория */}
+                {/* Категория — исправлено: показываем label вместо id */}
                 <td className={`${styles.td} ${styles.categoryCell}`}>
-                  {transaction?.category || '—'}
+                  {getCategoryLabel(transaction?.category, transaction?.type)}
                 </td>
 
-                {/* Сумма */}
+                {/* Сумма — с учётом валюты */}
                 <td className={`${styles.td} ${styles.amountCell} ${amountClass}`}>
-                  {amountPrefix}
-                  {(transaction?.amount ?? 0).toLocaleString('ru-RU')} ₽
+                  {formatCurrency(transaction?.amount, currency, true)}
                 </td>
 
                 {/* Комментарий */}

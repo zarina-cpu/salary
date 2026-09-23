@@ -1,13 +1,27 @@
 // Утилиты форматирования даты и валюты
+import { CURRENCIES } from './constants';
 
 /**
- * Форматирование суммы в валюту (рубли)
+ * Получение символа валюты по ID
+ * @param {string} currencyId - ID валюты (UZS, RUB, USD, EUR)
+ * @returns {string} Символ валюты
+ */
+export const getCurrencySymbol = (currencyId = 'UZS') => {
+  const currency = CURRENCIES.find((c) => c.id === currencyId);
+  return currency?.symbol || 'сўм';
+};
+
+/**
+ * Форматирование суммы в валюту
  * @param {number} amount - Сумма
+ * @param {string} currencyId - ID валюты
  * @param {boolean} showSign - Показывать знак + или -
  * @returns {string} Отформатированная строка
  */
-export const formatCurrency = (amount, showSign = false) => {
+export const formatCurrency = (amount, currencyId = 'UZS', showSign = false) => {
   const value = amount ?? 0;
+  const symbol = getCurrencySymbol(currencyId);
+  
   const formatted = Math.abs(value).toLocaleString('ru-RU', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -15,10 +29,10 @@ export const formatCurrency = (amount, showSign = false) => {
 
   if (showSign) {
     const sign = value >= 0 ? '+' : '−';
-    return `${sign}${formatted} ₽`;
+    return `${sign}${formatted} ${symbol}`;
   }
 
-  return `${formatted} ₽`;
+  return `${formatted} ${symbol}`;
 };
 
 /**

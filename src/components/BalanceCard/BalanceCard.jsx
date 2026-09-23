@@ -1,15 +1,17 @@
 // Карточка баланса с суммой, подписью и цветовой индикацией
 import React from 'react';
+import { formatCurrency } from '../../utils/formatters';
 import styles from './BalanceCard.module.css';
 
 function BalanceCard({
   title = 'Баланс',
   amount = 0,
-  variant = 'primary', // 'primary' | 'success' | 'danger' | 'warning'
+  variant = 'primary',
   icon = '',
+  currency = 'UZS',
 }) {
-  // Форматирование суммы с разделителями тысяч и символом валюты
-  const formattedAmount = (amount ?? 0).toLocaleString('ru-RU') + ' ₽';
+  // Форматирование суммы с учётом валюты
+  const formattedAmount = formatCurrency(amount, currency);
 
   // Определяем класс варианта
   const variantClass = styles[variant] || styles.primary;
