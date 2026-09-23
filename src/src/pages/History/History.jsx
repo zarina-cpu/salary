@@ -1,0 +1,245 @@
+// Страница истории операций с реальными данными и фильтрами
+import React, { useState, useEffect } from 'react';
+import TransactionList from '../../components/TransactionList/TransactionList';
+import Modal from '../../components/Modal/Modal';
+import TransactionForm from '../../components/TransactionForm/TransactionForm';
+import { getFilteredTransactions } from '../../services/summaryService';
+import { addIncome, updateIncome, deleteIncome } from '../../services/incomeService';
+import { addExpense, updateExpense, deleteExpense } from '../../services/expenseService';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../utils/constants';
+import styles from './History.module.css';
+
+function History() {
+  // Состояние фильтров
+  const [filters, setFilters] = useState({
+    type: '',
+    category: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
+  // Состояние данных
+  const [transactions, setTransactions] = useState([]);
+  
+  // Состояние модалки
+  const [showForm, setShowForm] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+
+  // Загрузка данных с учётом фильтров
+  const loadData = () => {
+    const filtered = getFilteredTransactions(filters);
+    setTransactions(filtered);
+  };
+
+  // Перезагрузка при изменении фильтров
+  useEffect(() => {
+    loadData();
+  }, [filters]);
+
+  // Обработчик изменения фильтров
+  const handleFilterChange = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Сброс фильтров
+  const handleResetFilters = () => {
+    setFilters({
+      type: '',
+      category: '',
+      dateFrom: '',
+      dateTo: '',
+    });
+  };
+
+  // Получение списка категорий для фильтра (объединённый)
+  const getAllCategories = () => {
+    if (filters.type === 'income') {
+      return INCOME_CATEGORIES;
+    }
+    if (filters.type === 'expense') {
+      return EXPENSE_CATEGORIES;
+    }
+    // Все категории (для фильтра «все типы»)
+    return [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+  };
+
+  // Обработчик добавления/редактирования
+  const handleSubmit = (transactionData) => {
+    try {
+      if (editingTransaction) {
+        // Режим редактирования
+        if (editingTransaction.type === 'income') {
+          updateIncome(editingTransaction.id, transactionData);
+        } else {
+          updateExpense(editingTransaction.id, transactionData);
+        }
+      } else {
+        // Режим добавления
+        if (transactionData.type === 'income') {
+          addIncome(transactionData);
+        } else {
+          addExpense(transactionData);
+        }
+      }
+
+      // Перезагружаем данные
+      loadData();
+      setShowForm(false);
+      setEditingTransaction(null);
+    } catch (error) {
+      console.error('Ошибка при сохранении транзакции:', error);
+      alert('Произошла ошибка при сохранении операции');
+    }
+  };
+
+  // Обработчик редактирования
+  const handleEdit = (transaction) => {
+    setEditingTransaction(transaction);
+    setShowForm(true);
+  };
+
+  // Обработчик удаления
+  const handleDelete = (id) => {
+    if (!id) return;
+
+    if (!window.confirm('Вы уверены, что хотите удалить эту операцию?')) {
+      return;
+    }
+
+    try {
+      const transaction = transactions.find((t) => t.id === id);
+      if (!transaction) return;
+
+      if (transaction.type === 'income') {
+        deleteIncome(id);
+      } else {
+        deleteExpense(id);
+      }
+
+      loadData();
+    } catch (error) {
+      console.error('Ошибка при удалении транзакции:', error);
+      alert('Произошла ошибка при удалении операции');
+    }
+  };
+
+  // Закрытие модалки
+  const handleCloseModal = () => {
+    setShowForm(false);
+    setEditingTransaction(null);
+  };
+
+  const categories = getAllCategories();
+
+  return (
+    <div className={styles.history}>
+      {/* Заголовок страницы с кнопкой добавления */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--spacing-md)' }}>
+        <h1 className={styles.title}>История операций</h1>
+        <button
+          onClick={() => setShowForm(true)}
+          style={{
+            padding: 'var(--spacing-sm) var(--spacing-lg)',
+            backgroundColor: 'var(--color-primary)',
+            color: 'white',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 500,
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
+        >
+          + Добавить операцию
+        </button>
+      </div>
+
+      {/* Панель фильтров */}
+      <div className={styles.filters}>
+        {/* Фильтр по типу операции */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Тип операции</label>
+          <select
+            className={styles.filterSelect}
+            value={filters.type}
+            onChange={(e) => handleFilterChange('type', e.target.value)}
+          >
+            <option value="">Все типы</option>
+            <option value="income">Доходы</option>
+            <option value="expense">Расходы</option>
+          </select>
+        </div>
+
+        {/* Фильтр по категории */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Категория</label>
+          <select
+            className={styles.filterSelect}
+            value={filters.category}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+          >
+            <option value="">Все категории</option>
+            {(categories || []).map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Фильтр по дате от */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Дата от</label>
+          <input
+            type="date"
+            className={styles.filterInput}
+            value={filters.dateFrom}
+            onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+          />
+        </div>
+
+        {/* Фильтр по дате до */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Дата до</label>
+          <input
+            type="date"
+            className={styles.filterInput}
+            value={filters.dateTo}
+            onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+          />
+        </div>
+
+        {/* Кнопка сброса фильтров */}
+        <button className={styles.resetButton} onClick={handleResetFilters}>
+          Сбросить
+        </button>
+      </div>
+
+      {/* Контейнер списка транзакций */}
+      <div className={styles.transactionsContainer}>
+        <TransactionList
+          transactions={transactions}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          emptyMessage="Нет операций"
+          emptyDescription="Добавьте первую операцию или измените фильтры"
+        />
+      </div>
+
+      {/* Модальное окно с формой */}
+      <Modal
+        isOpen={showForm}
+        onClose={handleCloseModal}
+        title={editingTransaction ? 'Редактировать операцию' : 'Добавить операцию'}
+      >
+        <TransactionForm
+          onSubmit={handleSubmit}
+          onCancel={handleCloseModal}
+          editData={editingTransaction}
+        />
+      </Modal>
+    </div>
+  );
+}
+
+export default History;

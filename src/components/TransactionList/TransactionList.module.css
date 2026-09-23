@@ -1,0 +1,192 @@
+/* Контейнер таблицы транзакций */
+.transactionList {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Таблица */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+/* Заголовки колонок */
+.thead {
+  background-color: var(--color-bg);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.th {
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.5px;
+}
+
+/* Строки транзакций */
+.tbody {
+  background-color: var(--color-bg-card);
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.2s;
+}
+
+.tr:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+/* Ячейки */
+.td {
+  padding: var(--spacing-md);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+/* Колонка с иконкой типа операции */
+.typeCell {
+  width: 50px;
+}
+
+/* Иконка типа операции */
+.typeIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+}
+
+.typeIconIncome {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.typeIconExpense {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+}
+
+/* Колонка с датой */
+.dateCell {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+/* Колонка с категорией */
+.categoryCell {
+  font-weight: 500;
+}
+
+/* Колонка с суммой */
+.amountCell {
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+}
+
+.amountIncome {
+  color: var(--color-success);
+}
+
+.amountExpense {
+  color: var(--color-danger);
+}
+
+/* Колонка с комментарием */
+.commentCell {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Колонка с действиями */
+.actionsCell {
+  width: 100px;
+  text-align: right;
+}
+
+/* Контейнер кнопок действий */
+.actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: flex-end;
+}
+
+/* Кнопка действия */
+.actionButton {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  transition: all 0.2s;
+}
+
+.actionButton:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.editButton:hover {
+  color: var(--color-primary);
+}
+
+.deleteButton:hover {
+  color: var(--color-danger);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .table {
+    font-size: var(--font-size-xs);
+  }
+  
+  .th,
+  .td {
+    padding: var(--spacing-sm);
+  }
+  
+  .commentCell {
+    display: none;
+  }
+  
+  .typeIcon {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-base);
+  }
+  
+  .amountCell {
+    font-size: var(--font-size-sm);
+  }
+  
+  .actionsCell {
+    width: 80px;
+  }
+  
+  .actionButton {
+    width: 28px;
+    height: 28px;
+  }
+}

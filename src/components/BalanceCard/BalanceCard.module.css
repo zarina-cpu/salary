@@ -1,0 +1,91 @@
+/* Контейнер карточки баланса */
+.card {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-primary);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Заголовок карточки */
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Сумма */
+.amount {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+/* Декоративный элемент (иконка или градиент) */
+.icon {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  font-size: 2.5rem;
+  opacity: 0.1;
+}
+
+/* Варианты цветов */
+.success {
+  border-left-color: var(--color-success);
+}
+
+.success .amount {
+  color: var(--color-success);
+}
+
+.danger {
+  border-left-color: var(--color-danger);
+}
+
+.danger .amount {
+  color: var(--color-danger);
+}
+
+.warning {
+  border-left-color: var(--color-warning);
+}
+
+.warning .amount {
+  color: var(--color-warning);
+}
+
+.primary {
+  border-left-color: var(--color-primary);
+}
+
+.primary .amount {
+  color: var(--color-primary);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-md);
+  }
+  
+  .amount {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .icon {
+    font-size: 2rem;
+  }
+}

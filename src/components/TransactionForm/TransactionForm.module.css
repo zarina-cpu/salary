@@ -1,0 +1,189 @@
+/* Контейнер формы */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Сетка полей формы */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+/* Группа поля */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* Группа на всю ширину */
+.formGroupFull {
+  grid-column: 1 / -1;
+}
+
+/* Label поля */
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Обязательное поле (звёздочка) */
+.required {
+  color: var(--color-danger);
+}
+
+/* Input, Select, Textarea */
+.input,
+.select,
+.textarea {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg-card);
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-light);
+}
+
+/* Textarea */
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Переключатель типа операции (доход/расход) */
+.typeSwitcher {
+  display: flex;
+  gap: var(--spacing-sm);
+  background-color: var(--color-bg);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
+}
+
+.typeButton {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.typeButton:hover {
+  color: var(--color-text);
+}
+
+.typeButtonActive {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.typeButtonIncomeActive {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.typeButtonExpenseActive {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+/* Футер формы с кнопками */
+.formFooter {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Кнопка */
+.button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.buttonPrimary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.buttonPrimary:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.buttonPrimary:active {
+  transform: translateY(0);
+}
+
+.buttonSecondary {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.buttonSecondary:hover {
+  background-color: var(--color-border);
+}
+
+/* Ошибка валидации */
+.error {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  margin-top: var(--spacing-xs);
+}
+
+.inputError {
+  border-color: var(--color-danger);
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .formFooter {
+    flex-direction: column-reverse;
+  }
+  
+  .formFooter .button {
+    width: 100%;
+  }
+  
+  .typeSwitcher {
+    flex-direction: column;
+  }
+}
