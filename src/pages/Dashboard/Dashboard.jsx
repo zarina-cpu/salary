@@ -39,30 +39,53 @@ function Dashboard() {
   }, []);
 
   // Обработчик добавления/редактирования
-  const handleSubmit = (transactionData) => {
-    try {
-      if (editingTransaction) {
-        if (editingTransaction.type === 'income') {
+ // Обработчик добавления/редактирования
+const handleSubmit = (transactionData) => {
+  try {
+    if (editingTransaction) {
+      // Режим редактирования
+      const oldType = editingTransaction.type;
+      const newType = transactionData.type;
+
+      if (oldType === newType) {
+        // Тип не изменился — просто обновляем
+        if (oldType === 'income') {
           updateIncome(editingTransaction.id, transactionData);
         } else {
           updateExpense(editingTransaction.id, transactionData);
         }
       } else {
-        if (transactionData.type === 'income') {
+        // Тип изменился — удаляем из старого массива и создаём в новом
+        if (oldType === 'income') {
+          deleteIncome(editingTransaction.id);
+        } else {
+          deleteExpense(editingTransaction.id);
+        }
+
+        if (newType === 'income') {
           addIncome(transactionData);
         } else {
           addExpense(transactionData);
         }
       }
-
-      loadData();
-      setShowForm(false);
-      setEditingTransaction(null);
-    } catch (error) {
-      console.error('Ошибка при сохранении транзакции:', error);
-      alert('Произошла ошибка при сохранении операции');
+    } else {
+      // Режим добавления
+      if (transactionData.type === 'income') {
+        addIncome(transactionData);
+      } else {
+        addExpense(transactionData);
+      }
     }
-  };
+
+    // Перезагружаем данные
+    loadData();
+    setShowForm(false);
+    setEditingTransaction(null);
+  } catch (error) {
+    console.error('Ошибка при сохранении транзакции:', error);
+    alert('Произошла ошибка при сохранении операции');
+  }
+};
 
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
