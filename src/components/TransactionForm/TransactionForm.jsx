@@ -1,6 +1,7 @@
 // Форма добавления/редактирования транзакции
 import React, { useState, useEffect } from 'react';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, CURRENCIES } from '../../utils/constants';
+import { CURRENCIES } from '../../utils/constants';
+import { getAllCategoriesByType, addCustomCategory } from '../../services/categoryService';
 import styles from './TransactionForm.module.css';
 
 function TransactionForm({
@@ -9,7 +10,6 @@ function TransactionForm({
   editData = null,
   defaultCurrency = 'UZS',
 }) {
-  // Начальное состояние формы
   const initialFormData = {
     type: 'expense',
     category: '',
@@ -21,8 +21,9 @@ function TransactionForm({
 
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [newCategoryLabel, setNewCategoryLabel] = useState('');
 
-  // Заполнение формы при редактировании
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -36,12 +37,10 @@ function TransactionForm({
     }
   }, [editData, defaultCurrency]);
 
-  // Получение категорий в зависимости от типа операции
   const getCategories = () => {
-    return formData.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    return getAllCategoriesByType(formData.type);
   };
 
-  // Обработчик изменения типа операции
   const handleTypeChange = (type) => {
     setFormData((prev) => ({
       ...prev,
@@ -49,9 +48,10 @@ function TransactionForm({
       category: '',
     }));
     setErrors((prev) => ({ ...prev, category: '' }));
+    setShowNewCategoryInput(false);
+    setNewCategoryLabel('');
   };
 
-  // Обработчик изменения поля
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -59,7 +59,44 @@ function TransactionForm({
     }
   };
 
-  // Валидация формы
+  // Обработчик выбора категории (включая "Добавить свою")
+  const handleCategoryChange = (value) => {
+    if (value === '__add_new__') {
+      setShowNewCategoryInput(true);
+      setFormData((prev) => ({ ...prev, category: '' }));
+    } else {
+      setShowNewCategoryInput(false);
+      setNewCategoryLabel('');
+      handleFieldChange('category', value);
+    }
+  };
+
+  // Обработчик добавления новой категории
+  const handleAddNewCategory = () => {
+    if (!newCategoryLabel.trim()) {
+      setErrors((prev) => ({ ...prev, newCategory: 'Введите название категории' }));
+      return;
+    }
+
+    try {
+      const newCategory = addCustomCategory(newCategoryLabel.trim(), formData.type);
+      handleFieldChange('category', newCategory.id);
+      setShowNewCategoryInput(false);
+      setNewCategoryLabel('');
+      setErrors((prev) => ({ ...prev, newCategory: '' }));
+    } catch (error) {
+      console.error('Ошибка при создании категории:', error);
+      setErrors((prev) => ({ ...prev, newCategory: 'Ошибка при создании категории' }));
+    }
+  };
+
+  // Отмена ввода новой категории
+  const handleCancelNewCategory = () => {
+    setShowNewCategoryInput(false);
+    setNewCategoryLabel('');
+    setErrors((prev) => ({ ...prev, newCategory: '' }));
+  };
+
   const validate = () => {
     const newErrors = {};
 
@@ -79,7 +116,6 @@ function TransactionForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Обработчик отправки формы
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -152,19 +188,50 @@ function TransactionForm({
           <label className={styles.label}>
             Категория <span className={styles.required}>*</span>
           </label>
-          <select
-            className={`${styles.select} ${errors.category ? styles.inputError : ''}`}
-            value={formData.category}
-            onChange={(e) => handleFieldChange('category', e.target.value)}
-          >
-            <option value="">Выберите категорию</option>
-            {(categories || []).map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
+          {!showNewCategoryInput ? (
+            <select
+              className={`${styles.select} ${errors.category ? styles.inputError : ''}`}
+              value={formData.category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+            >
+              <option value="">Выберите категорию</option>
+              {(categories || []).map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.label}
+                </option>
+              ))}
+              <option value="__add_new__">➕ Добавить свою категорию</option>
+            </select>
+          ) : (
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                className={`${styles.input} ${errors.newCategory ? styles.inputError : ''}`}
+                placeholder="Название категории"
+                value={newCategoryLabel}
+                onChange={(e) => setNewCategoryLabel(e.target.value)}
+                autoFocus
+              />
+              <button
+                type="button"
+                className={`${styles.button} ${styles.buttonPrimary}`}
+                onClick={handleAddNewCategory}
+                style={{ padding: 'var(--spacing-sm) var(--spacing-md)' }}
+              >
+                ✓
+              </button>
+              <button
+                type="button"
+                className={`${styles.button} ${styles.buttonSecondary}`}
+                onClick={handleCancelNewCategory}
+                style={{ padding: 'var(--spacing-sm) var(--spacing-md)' }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
           {errors.category && <div className={styles.error}>{errors.category}</div>}
+          {errors.newCategory && <div className={styles.error}>{errors.newCategory}</div>}
         </div>
 
         {/* Сумма */}

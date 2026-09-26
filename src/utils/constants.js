@@ -44,4 +44,5 @@ export const STORAGE_KEYS = {
   INCOMES: 'incomes',
   EXPENSES: 'expenses',
   SETTINGS: 'settings',
+  CUSTOM_CATEGORIES: 'custom_categories', // ← ДОБАВЛЕНА ЭТА СТРОКА
 };

@@ -6,7 +6,7 @@ import TransactionForm from '../../components/TransactionForm/TransactionForm';
 import { getFilteredTransactions } from '../../services/summaryService';
 import { addIncome, updateIncome, deleteIncome } from '../../services/incomeService';
 import { addExpense, updateExpense, deleteExpense } from '../../services/expenseService';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../utils/constants';
+import { getAllCategoriesByType } from '../../services/categoryService';
 import { getItem } from '../../services/storage';
 import { STORAGE_KEYS } from '../../utils/constants';
 import styles from './History.module.css';
@@ -23,7 +23,6 @@ function History() {
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
   
-  // Валюта по умолчанию
   const [defaultCurrency, setDefaultCurrency] = useState(() => {
     const settings = getItem(STORAGE_KEYS.SETTINGS, {});
     return settings.currency || 'UZS';
@@ -53,61 +52,59 @@ function History() {
 
   const getAllCategories = () => {
     if (filters.type === 'income') {
-      return INCOME_CATEGORIES;
+      return getAllCategoriesByType('income');
     }
     if (filters.type === 'expense') {
-      return EXPENSE_CATEGORIES;
+      return getAllCategoriesByType('expense');
     }
-    return [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+    // Все категории (стандартные + пользовательские)
+    return [
+      ...getAllCategoriesByType('income'),
+      ...getAllCategoriesByType('expense'),
+    ];
   };
 
-  // Обработчик добавления/редактирования
-const handleSubmit = (transactionData) => {
-  try {
-    if (editingTransaction) {
-      // Режим редактирования
-      const oldType = editingTransaction.type;
-      const newType = transactionData.type;
+  const handleSubmit = (transactionData) => {
+    try {
+      if (editingTransaction) {
+        const oldType = editingTransaction.type;
+        const newType = transactionData.type;
 
-      if (oldType === newType) {
-        // Тип не изменился — просто обновляем
-        if (oldType === 'income') {
-          updateIncome(editingTransaction.id, transactionData);
+        if (oldType === newType) {
+          if (oldType === 'income') {
+            updateIncome(editingTransaction.id, transactionData);
+          } else {
+            updateExpense(editingTransaction.id, transactionData);
+          }
         } else {
-          updateExpense(editingTransaction.id, transactionData);
+          if (oldType === 'income') {
+            deleteIncome(editingTransaction.id);
+          } else {
+            deleteExpense(editingTransaction.id);
+          }
+
+          if (newType === 'income') {
+            addIncome(transactionData);
+          } else {
+            addExpense(transactionData);
+          }
         }
       } else {
-        // Тип изменился — удаляем из старого массива и создаём в новом
-        if (oldType === 'income') {
-          deleteIncome(editingTransaction.id);
-        } else {
-          deleteExpense(editingTransaction.id);
-        }
-
-        if (newType === 'income') {
+        if (transactionData.type === 'income') {
           addIncome(transactionData);
         } else {
           addExpense(transactionData);
         }
       }
-    } else {
-      // Режим добавления
-      if (transactionData.type === 'income') {
-        addIncome(transactionData);
-      } else {
-        addExpense(transactionData);
-      }
-    }
 
-    // Перезагружаем данные
-    loadData();
-    setShowForm(false);
-    setEditingTransaction(null);
-  } catch (error) {
-    console.error('Ошибка при сохранении транзакции:', error);
-    alert('Произошла ошибка при сохранении операции');
-  }
-};
+      loadData();
+      setShowForm(false);
+      setEditingTransaction(null);
+    } catch (error) {
+      console.error('Ошибка при сохранении транзакции:', error);
+      alert('Произошла ошибка при сохранении операции');
+    }
+  };
 
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
