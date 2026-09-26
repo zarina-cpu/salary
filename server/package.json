@@ -1,0 +1,27 @@
+{
+  "name": "salary-tracker-server",
+  "version": "1.0.0",
+  "description": "REST API для приложения Salary Tracker на Node.js + Express + SQLite",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "salary",
+    "tracker",
+    "express",
+    "sqlite",
+    "rest-api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
