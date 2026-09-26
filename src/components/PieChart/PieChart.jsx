@@ -9,25 +9,27 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import EmptyState from '../EmptyState/EmptyState';
+import { getCurrencySymbol } from '../../utils/formatters';
 
 // Цветовая палитра для секторов
 const COLORS = [
-  '#4f46e5', // primary
-  '#10b981', // success
-  '#f59e0b', // warning
-  '#ef4444', // danger
-  '#8b5cf6', // purple
-  '#06b6d4', // cyan
-  '#ec4899', // pink
-  '#84cc16', // lime
-  '#f97316', // orange
-  '#14b8a6', // teal
+  '#4f46e5',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#06b6d4',
+  '#ec4899',
+  '#84cc16',
+  '#f97316',
+  '#14b8a6',
 ];
 
-// Кастомный tooltip
-const CustomTooltip = ({ active, payload }) => {
+// Кастомный tooltip (принимает currency через payload)
+const CustomTooltip = ({ active, payload, currency }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
+    const symbol = getCurrencySymbol(currency);
     return (
       <div
         style={{
@@ -42,7 +44,7 @@ const CustomTooltip = ({ active, payload }) => {
           {data.name}
         </div>
         <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-          {data.value.toLocaleString('ru-RU')} ₽
+          {data.value.toLocaleString('ru-RU')} {symbol}
         </div>
       </div>
     );
@@ -55,8 +57,8 @@ function PieChart({
   title = 'Расходы по категориям',
   emptyMessage = 'Нет данных для отображения',
   emptyDescription = 'Добавьте расходы, чтобы увидеть диаграмму',
+  currency = 'UZS',
 }) {
-  // Если данных нет — показываем заглушку
   if (!data || data.length === 0) {
     return (
       <div style={{ padding: '2rem' }}>
@@ -87,7 +89,7 @@ function PieChart({
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip currency={currency} />} />
           <Legend
             verticalAlign="bottom"
             height={36}

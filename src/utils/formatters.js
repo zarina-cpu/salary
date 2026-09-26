@@ -3,8 +3,6 @@ import { CURRENCIES } from './constants';
 
 /**
  * Получение символа валюты по ID
- * @param {string} currencyId - ID валюты (UZS, RUB, USD, EUR)
- * @returns {string} Символ валюты
  */
 export const getCurrencySymbol = (currencyId = 'UZS') => {
   const currency = CURRENCIES.find((c) => c.id === currencyId);
@@ -15,30 +13,34 @@ export const getCurrencySymbol = (currencyId = 'UZS') => {
  * Форматирование суммы в валюту
  * @param {number} amount - Сумма
  * @param {string} currencyId - ID валюты
- * @param {boolean} showSign - Показывать знак + или -
+ * @param {boolean} showSign - Показывать знак + или - (для транзакций)
  * @returns {string} Отформатированная строка
  */
 export const formatCurrency = (amount, currencyId = 'UZS', showSign = false) => {
   const value = amount ?? 0;
   const symbol = getCurrencySymbol(currencyId);
-  
-  const formatted = Math.abs(value).toLocaleString('ru-RU', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
 
   if (showSign) {
+    // Для транзакций: абсолютное значение с префиксом +/−
+    const absValue = Math.abs(value);
+    const formatted = absValue.toLocaleString('ru-RU', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
     const sign = value >= 0 ? '+' : '−';
     return `${sign}${formatted} ${symbol}`;
   }
 
+  // Для баланса и общих сумм: сохраняем знак минус
+  const formatted = value.toLocaleString('ru-RU', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
   return `${formatted} ${symbol}`;
 };
 
 /**
- * Форматирование даты в длинный формат (24 сентября 2026)
- * @param {string|Date} dateString - Дата в формате ISO или объект Date
- * @returns {string} Отформатированная дата
+ * Форматирование даты в длинный формат
  */
 export const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -58,9 +60,7 @@ export const formatDate = (dateString) => {
 };
 
 /**
- * Форматирование даты в короткий формат (24.09.2026)
- * @param {string|Date} dateString - Дата в формате ISO или объект Date
- * @returns {string} Отформатированная дата
+ * Форматирование даты в короткий формат
  */
 export const formatDateShort = (dateString) => {
   if (!dateString) return '';
@@ -80,9 +80,7 @@ export const formatDateShort = (dateString) => {
 };
 
 /**
- * Форматирование месяца для графиков (Сен 2026)
- * @param {string|Date} dateString - Дата в формате ISO или объект Date
- * @returns {string} Отформатированный месяц
+ * Форматирование месяца для графиков
  */
 export const formatMonth = (dateString) => {
   if (!dateString) return '';
@@ -101,17 +99,14 @@ export const formatMonth = (dateString) => {
 };
 
 /**
- * Получение текущей даты в формате ISO (YYYY-MM-DD)
- * @returns {string} Дата в формате ISO
+ * Получение текущей даты в формате ISO
  */
 export const getCurrentDateISO = () => {
   return new Date().toISOString().split('T')[0];
 };
 
 /**
- * Получение ключа месяца для группировки (2026-09)
- * @param {string|Date} dateString - Дата в формате ISO или объект Date
- * @returns {string} Ключ месяца
+ * Получение ключа месяца для группировки
  */
 export const getMonthKey = (dateString) => {
   if (!dateString) return '';

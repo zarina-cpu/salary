@@ -11,10 +11,12 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import EmptyState from '../EmptyState/EmptyState';
+import { getCurrencySymbol } from '../../utils/formatters';
 
 // Кастомный tooltip
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, currency }) => {
   if (active && payload && payload.length) {
+    const symbol = getCurrencySymbol(currency);
     return (
       <div
         style={{
@@ -37,7 +39,7 @@ const CustomTooltip = ({ active, payload, label }) => {
               marginBottom: '0.25rem',
             }}
           >
-            {entry.name}: {entry.value.toLocaleString('ru-RU')} ₽
+            {entry.name}: {entry.value.toLocaleString('ru-RU')} {symbol}
           </div>
         ))}
       </div>
@@ -51,8 +53,8 @@ function BarChart({
   title = 'Доходы и расходы по месяцам',
   emptyMessage = 'Нет данных для отображения',
   emptyDescription = 'Добавьте операции, чтобы увидеть график',
+  currency = 'UZS',
 }) {
-  // Если данных нет — показываем заглушку
   if (!data || data.length === 0) {
     return (
       <div style={{ padding: '2rem' }}>
@@ -64,6 +66,8 @@ function BarChart({
       </div>
     );
   }
+
+  const symbol = getCurrencySymbol(currency);
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -86,9 +90,9 @@ function BarChart({
           <YAxis
             stroke="#6b7280"
             style={{ fontSize: '0.875rem' }}
-            tickFormatter={(value) => `${value.toLocaleString('ru-RU')} ₽`}
+            tickFormatter={(value) => `${value.toLocaleString('ru-RU')} ${symbol}`}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip currency={currency} />} />
           <Legend
             verticalAlign="top"
             height={36}
