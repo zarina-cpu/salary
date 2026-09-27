@@ -1,4 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';// Подключение к базе данных SQLite через встроенный модуль node:sqlite
+// Подключение к базе данных SQLite через встроенный модуль node:sqlite
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, mkdirSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
